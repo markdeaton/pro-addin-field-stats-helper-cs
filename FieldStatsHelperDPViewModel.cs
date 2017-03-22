@@ -29,6 +29,7 @@ using ArcGIS.Core.Data;
 using MathNet.Numerics.Statistics;
 using System;
 using System.Globalization;
+using System.Windows;
 
 namespace FieldStatsHelper
 {
@@ -172,8 +173,7 @@ namespace FieldStatsHelper
                                 values.Add(Convert.ToDouble(value));
                             } catch {
                                 errors.Add(rc.Current.GetObjectID()); // Shouldn't hit this
-                            }
-                        else // Note the null value
+                            } else // Note the null value
                             nulls.Add(long.MinValue);
                     }
                 }
@@ -452,7 +452,7 @@ namespace FieldStatsHelper
 
 
     [ValueConversion(typeof(double), typeof(string))]
-    internal class FieldStatDoubleToStringConverter : IValueConverter {
+    public class FieldStatDoubleToStringConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if (value.GetType() == typeof(double) && Double.IsNaN((double)value))
                 return String.Empty;
@@ -463,8 +463,8 @@ namespace FieldStatsHelper
             return null;
         }
     }
-
-    internal class FieldNullIntToStringConverter : IValueConverter {
+    [ValueConversion(typeof(int), typeof(string))]
+    public class FieldNullIntToStringConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if (value.GetType() == typeof(int) && (int)value < 0)
                 return String.Empty;
@@ -473,6 +473,23 @@ namespace FieldStatsHelper
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             return null;
+        }
+    }
+
+    [ValueConversion(typeof(List<KeyValuePair<double, int>>), typeof(Visibility))]
+    public class ChartVisibilityDataAvailableConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            if (value != null
+                && (value.GetType() == typeof(List<KeyValuePair<double, int>>))
+                && ((List<KeyValuePair<double, int>>)value).Count > 0) {
+                    return Visibility.Visible;
+            }
+            else return Visibility.Collapsed;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotImplementedException();
         }
     }
 }

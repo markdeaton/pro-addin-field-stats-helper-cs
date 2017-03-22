@@ -24,9 +24,10 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.-->
     <UserControl.Resources>
-        <ResourceDictionary>
-            <conv:FieldStatDoubleToStringConverter x:Key="statStringToDoubleConverter"/>
-            <conv:FieldNullIntToStringConverter x:Key="nullIntToStringConverter"/>
+        <conv:FieldStatDoubleToStringConverter x:Key="statStringToDoubleConverter"/>
+        <conv:FieldNullIntToStringConverter x:Key="nullIntToStringConverter"/>
+        <conv:ChartVisibilityDataAvailableConverter x:Key="chartVisibilityDataAvailConverter"/>
+        <ResourceDictionary x:Key="MergedDictionaries">
             <ResourceDictionary.MergedDictionaries>
                 <extensions:DesignOnlyResourceDictionary Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -35,6 +36,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -54,12 +56,6 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -73,37 +69,65 @@
                      Margin="5" DisplayMemberPath="Name" SelectedItem="{Binding SelectedMap, Mode=TwoWay}"/>
 
             <Label Grid.Row="1" Grid.Column="0" Content="Layers"/>
-            <ComboBox x:Name="LstLayers" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
+            <ComboBox x:Name="LstLayers" Grid.Row="1" Grid.Column="1" Margin="5"
                       ItemsSource="{Binding ListOfLayers}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedLayer, Mode=TwoWay}"/>
 
             <Label Grid.Row="2" Grid.Column="0" Content="Fields"/>
             <ComboBox Grid.Row="2" Grid.Column="1" x:Name="LstFields" ItemsSource="{Binding ListOfFields}" Margin="5" 
                      DisplayMemberPath="Alias" SelectedItem="{Binding SelectedField, Mode=TwoWay}"/>
+        </Grid>
+        <Line/>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <Label x:Name="label" Grid.Row="3" Grid.Column="0" Content="Min:"/>
-            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding FieldMin, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1"/>
-            <Label Grid.Row="4" Grid.Column="0" Content="Max:"/>
-            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding FieldMax, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1"/>
-            <Label Grid.Row="5" Grid.Column="0" Content="Mean:"/>
-            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding FieldMean, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1"/>
-            <Label Grid.Row="6" Grid.Column="0" Content="Median:"/>
-            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding FieldMedian, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1"/>
-            <Label Grid.Row="7" Grid.Column="0" Content="Std Dev:"/>
-            <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding FieldStdDev, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1"/>
-            <Label Grid.Row="8" Grid.Column="0" Content="Nulls Ignored:"/>
-            <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding FieldNulls, StringFormat=0;, Converter={StaticResource nullIntToStringConverter}}" IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1"/>
+            <Label Grid.Row="0" Grid.Column="0" Content="Min:"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FieldMin, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" 
+                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
+            <Label Grid.Row="0" Grid.Column="2" Content="Max:"/>
+            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding FieldMax, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" 
+                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
+            <Label Grid.Row="1" Grid.Column="0" Content="Mean:"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding FieldMean, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" 
+                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
+            <Label Grid.Row="1" Grid.Column="2" Content="Median:"/>
+            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding FieldMedian, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" 
+                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
+            <Label Grid.Row="2" Grid.Column="0" Content="Std Dev:"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FieldStdDev, StringFormat=0.000;;0, Converter={StaticResource statStringToDoubleConverter}}" 
+                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
+            <Label Grid.Row="2" Grid.Column="2" Content="Nulls Ignored:"/>
+            <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding FieldNulls, StringFormat=0;, Converter={StaticResource nullIntToStringConverter}}" 
+                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
         </Grid>
         <chartingToolkit:Chart
-            Grid.Row="2" Grid.Column="0"          
-            Margin="2, 2, 2, 2" Name="chtHistogram" 
+            Grid.Row="3"
+            Margin="2, 2, 2, 2" x:Name="chtHistogram" 
             Height="320" Width="275"
-            Title="Histogram">
+            Title="Histogram"
+            Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
+            <chartingToolkit:Chart.PlotAreaStyle>
+                <Style TargetType="Grid">
+                    <Setter Property="Background" Value="Gray"/>
+                    <Setter Property="Opacity" Value="0.15"/>
+                </Style>
+            </chartingToolkit:Chart.PlotAreaStyle>
             <chartingToolkit:Chart.Axes>
                 <chartingToolkit:LinearAxis Orientation="X"></chartingToolkit:LinearAxis>
-                <chartingToolkit:LinearAxis Orientation="Y"></chartingToolkit:LinearAxis>
+                <chartingToolkit:LinearAxis Orientation="Y" Title="Number of Records"></chartingToolkit:LinearAxis>
             </chartingToolkit:Chart.Axes>
 
-            <chartingToolkit:ColumnSeries x:Name="columnSeriesHistogram" IndependentValuePath="Key" DependentValuePath="Value" ItemsSource="{Binding Path=ChartData}"/>
+            <chartingToolkit:ColumnSeries x:Name="columnSeriesHistogram" IndependentValuePath="Key" DependentValuePath="Value" ItemsSource="{Binding Path=ChartData}"
+                                          Background="Transparent"/>
 
             <chartingToolkit:Chart.LegendStyle>
                 <Style TargetType="datavis:Legend">

@@ -24,7 +24,8 @@
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files\ArcGIS Pro\bin\ArcGISPro.exe</StartProgram>
     <PlatformTarget>x64</PlatformTarget>
-    <DocumentationFile>bin\Debug\FieldStatsHelper.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

@@ -23,12 +23,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DockpaneSimple")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Field Stats Helper")]
+[assembly: AssemblyDescription("A field statistics panel for ArcGIS Pro")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Acme")]
-[assembly: AssemblyProduct("DockpaneSimple")]
-[assembly: AssemblyCopyright("Copyright © Acme 2015")]
+[assembly: AssemblyCompany("Esri Applications Prototype Lab")]
+[assembly: AssemblyProduct("FieldStatsHelper")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
