@@ -94,7 +94,7 @@ namespace FieldStatsHelper
         public List<KeyValuePair<double, int>> ChartData {
             get { return _chartData; }
             set {
-                SetProperty(ref _chartData, value, () => ChartData);
+                SetProperty(ref _chartData, value);
             }
         }
 
@@ -113,7 +113,7 @@ namespace FieldStatsHelper
                 System.Diagnostics.Debug.WriteLine("selected map");
                 // make sure we're on the UI thread
                 Utils.RunOnUIThread(() => {
-                    SetProperty(ref _selectedMap, value, () => SelectedMap);
+                    SetProperty(ref _selectedMap, value);
                     if (_selectedMap != null) {
                         // open /activate the map
                         Utils.OpenAndActivateMap(_selectedMap.URI);
@@ -130,7 +130,7 @@ namespace FieldStatsHelper
         public FeatureLayer SelectedLayer {
             get { return _selectedLayer; }
             set {
-                SetProperty(ref _selectedLayer, value, () => SelectedLayer);
+                SetProperty(ref _selectedLayer, value);
                 System.Diagnostics.Debug.WriteLine("selected layer");
                 if (_selectedLayer != null) {
                     // Get fields in the feature layer
@@ -148,7 +148,7 @@ namespace FieldStatsHelper
         public FieldDescription SelectedField {
             get { return _selectedField; }
             set {
-                SetProperty(ref _selectedField, value, () => SelectedField);
+                SetProperty(ref _selectedField, value);
                 System.Diagnostics.Debug.WriteLine("selected field");
                 if (_selectedField != null) {
                     UpdateFieldStats();
@@ -204,7 +204,7 @@ namespace FieldStatsHelper
             }
 
             set {
-                SetProperty(ref _fieldMin, value, () => FieldMin);
+                SetProperty(ref _fieldMin, value);
             }
         }
 
@@ -214,7 +214,7 @@ namespace FieldStatsHelper
             }
 
             set {
-                SetProperty(ref _fieldMax, value, () => FieldMax);
+                SetProperty(ref _fieldMax, value);
             }
         }
 
@@ -224,7 +224,7 @@ namespace FieldStatsHelper
             }
 
             set {
-                SetProperty(ref _fieldMean, value, () => FieldMean);
+                SetProperty(ref _fieldMean, value);
             }
         }
 
@@ -234,7 +234,7 @@ namespace FieldStatsHelper
             }
 
             set {
-                SetProperty(ref _fieldMedian, value, () => FieldMedian);
+                SetProperty(ref _fieldMedian, value);
             }
         }
 
@@ -244,7 +244,7 @@ namespace FieldStatsHelper
             }
 
             set {
-                SetProperty(ref _fieldStdDev, value, () => FieldStdDev);
+                SetProperty(ref _fieldStdDev, value);
             }
         }
 
@@ -254,7 +254,7 @@ namespace FieldStatsHelper
             }
 
             set {
-                SetProperty(ref _fieldNulls, value, () => FieldNulls);
+                SetProperty(ref _fieldNulls, value);
             }
         }
 
@@ -315,7 +315,7 @@ namespace FieldStatsHelper
             get { return _heading; }
             set
             {
-                SetProperty(ref _heading, value, () => Heading);
+                SetProperty(ref _heading, value);
             }
         }
 
