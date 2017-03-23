@@ -98,6 +98,11 @@ namespace FieldStatsHelper
             }
         }
 
+        public string ChartTitle {
+            get {
+                return "Histogram\n[" + SelectedField?.Name + "]";
+            }
+        }
         /// <summary>
         /// This is where we store the selected map 
         /// </summary>
@@ -148,6 +153,7 @@ namespace FieldStatsHelper
                 if (_selectedField != null) {
                     UpdateFieldStats();
                 }
+                NotifyPropertyChanged("ChartTitle");
                 System.Diagnostics.Debug.WriteLine("Selected field changed");
             }
         }

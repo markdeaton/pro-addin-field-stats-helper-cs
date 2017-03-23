@@ -113,8 +113,17 @@
             Grid.Row="3"
             Margin="2, 2, 2, 2" x:Name="chtHistogram" 
             Height="320" Width="275"
-            Title="Histogram"
+            Title="{Binding Path=ChartTitle}"
             Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
+            <chartingToolkit:Chart.TitleStyle>
+                <Style TargetType="datavis:Title">
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                    <Setter Property="TextBlock.LineHeight" Value="20"/>
+                </Style>
+            </chartingToolkit:Chart.TitleStyle>
+            
             <chartingToolkit:Chart.PlotAreaStyle>
                 <Style TargetType="Grid">
                     <Setter Property="Background" Value="Gray"/>
