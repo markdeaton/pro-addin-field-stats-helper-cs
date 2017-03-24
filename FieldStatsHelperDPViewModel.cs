@@ -12,27 +12,25 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License. 
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Windows.Data;
-using System.Windows.Input;
+using ArcGIS.Core.Data;
 using ArcGIS.Desktop.Core;
 using ArcGIS.Desktop.Core.Events;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
-using ArcGIS.Core.Data;
 using MathNet.Numerics.Statistics;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
-namespace FieldStatsHelper
-{
+namespace FieldStatsHelper {
     internal class FieldStatsHelperDPViewModel : DockPane
     {
         #region Private Properties
@@ -90,8 +88,8 @@ namespace FieldStatsHelper
         /// <summary>
         /// Data for the histogram
         /// </summary>
-        public List<KeyValuePair<double, int>> _chartData; // = new ObservableCollection<KeyValuePair<int, double>>();
-        public List<KeyValuePair<double, int>> ChartData {
+        public List<ChartHistogramItem> _chartData; // = new ObservableCollection<KeyValuePair<int, double>>();
+        public List<ChartHistogramItem> ChartData {
             get { return _chartData; }
             set {
                 SetProperty(ref _chartData, value);
@@ -106,7 +104,6 @@ namespace FieldStatsHelper
         /// <summary>
         /// This is where we store the selected map 
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014:Await.Warning")]
         public Map SelectedMap {
             get { return _selectedMap; }
             set {
@@ -126,7 +123,6 @@ namespace FieldStatsHelper
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014:Await.Warning")]
         public FeatureLayer SelectedLayer {
             get { return _selectedLayer; }
             set {
@@ -144,7 +140,6 @@ namespace FieldStatsHelper
         /// <summary>
         /// This is where we store the selected Field 
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014:Await.Warning")]
         public FieldDescription SelectedField {
             get { return _selectedField; }
             set {
@@ -158,30 +153,26 @@ namespace FieldStatsHelper
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014:Await.Warning")]
-        private async Task UpdateFieldStats() {
-            object _lockValueList = new object();
-            List<double> values = new List<double>();
-            List<long> nulls = new List<long>(); // OIDs of null values
-            List<long> errors = new List<long>(); // OIDs of non-numeric values
+        private void UpdateFieldStats() {
             // GetMap needs to be on the MCT
             QueuedTask.Run(() => {
+                List<double> values = new List<double>();
+                List<long> nulls = new List<long>(); // OIDs of null values
+                List<long> errors = new List<long>(); // OIDs of non-numeric values
                 // Get and display statistics for the field
                 QueryFilter qf = new QueryFilter();
                 qf.SubFields = _selectedField.Name;
                 RowCursor rc = SelectedLayer.GetTable().Search(qf);
                 int iField = rc.FindField(_selectedField.Name);
-                lock (_lockValueList) {
-                    while (rc.MoveNext()) {
-                        object value = rc.Current.GetOriginalValue(iField);
-                        if (value != DBNull.Value)
-                            try {
-                                values.Add(Convert.ToDouble(value));
-                            } catch {
-                                errors.Add(rc.Current.GetObjectID()); // Shouldn't hit this
-                            } else // Note the null value
+                while (rc.MoveNext()) {
+                    object value = rc.Current.GetOriginalValue(iField);
+                    if (value != DBNull.Value)
+                        try {
+                            values.Add(Convert.ToDouble(value));
+                        } catch {
+                            errors.Add(rc.Current.GetObjectID()); // Shouldn't hit this
+                        } else // Note the null value
                             nulls.Add(long.MinValue);
-                    }
                 }
                 FieldMedian = Statistics.Median(values);
                 FieldMean = Statistics.Mean(values);
@@ -190,10 +181,14 @@ namespace FieldStatsHelper
                 FieldStdDev = Statistics.StandardDeviation(values);
                 FieldNulls = nulls.Count;
 
+                // Find median absolute deviation
+                IEnumerable<double> tempValues = values.Select(value => Math.Abs(value - FieldMedian));
+                double medianAbsoluteDeviation = Statistics.Median(tempValues);
+
                 Histogram histogram = new Histogram(values, 25);
-                ChartData = new List<KeyValuePair<double, int>>();
+                ChartData = new List<ChartHistogramItem>();
                 for (int i = 0; i < histogram.BucketCount; i++) {
-                    ChartData.Add(new KeyValuePair<double, int>(histogram[i].UpperBound, (int)histogram[i].Count));
+                    ChartData.Add(new ChartHistogramItem((int)histogram[i].Count, histogram[i].LowerBound, histogram[i].UpperBound));
                 }
             });
         }
@@ -384,7 +379,7 @@ namespace FieldStatsHelper
         /// <summary>
         /// Method for retrieving map items in the project.
         /// </summary>
-        private async void RetrieveMaps()
+        private void RetrieveMaps()
         {
             System.Diagnostics.Debug.WriteLine("RetrieveMaps");
             // clear the collections
@@ -394,19 +389,18 @@ namespace FieldStatsHelper
             {
                 System.Diagnostics.Debug.WriteLine("RetrieveMaps add maps");
                 // GetMap needs to be on the MCT
-                await QueuedTask.Run(() =>
+                QueuedTask.Run(() =>
                 {
                     // get the map project items and add to my collection
-                    foreach (MapProjectItem item in Project.Current.GetItems<MapProjectItem>())
-                    {
+                    foreach (MapProjectItem item in Project.Current.GetItems<MapProjectItem>()) {
                         _listOfMaps.Add(item.GetMap());
                     }
+                    System.Diagnostics.Debug.WriteLine("RetrieveMaps added maps");
                 });
             }
-            System.Diagnostics.Debug.WriteLine("RetrieveMaps added maps");
         }
 
-        private async Task UpdateLayers(Map map) {
+        private void UpdateLayers(Map map) {
             // get the layers.  GetLayers needs to be on MCT but want to refresh members and properties on UI thread
 
             System.Diagnostics.Debug.WriteLine("UpdateLayers");
@@ -417,16 +411,16 @@ namespace FieldStatsHelper
                 System.Diagnostics.Debug.WriteLine("RetrieveMaps no maps");
                 return;
             }
-            await QueuedTask.Run(() =>
+            QueuedTask.Run(() =>
             {
                 foreach (var layer in map.GetLayersAsFlattenedList()) {
                     if (layer is FeatureLayer) _listOfLayers.Add((FeatureLayer) layer);
                 }
+                System.Diagnostics.Debug.WriteLine("UpdateLayers new list done");
             });
-            System.Diagnostics.Debug.WriteLine("UpdateLayers new list done");
         }
 
-        private async Task UpdateFields(FeatureLayer layer) {
+        private void UpdateFields(FeatureLayer layer) {
             System.Diagnostics.Debug.WriteLine("UpdateFields");
             _listOfFields.Clear();
             System.Diagnostics.Debug.WriteLine("UpdateFields list cleared");
@@ -434,7 +428,7 @@ namespace FieldStatsHelper
                 System.Diagnostics.Debug.WriteLine("No feature layer selected");
                 return;
             }
-            await QueuedTask.Run(() => {
+            QueuedTask.Run(() => {
                 foreach (var field in layer.GetFieldDescriptions()) {
                     if (field.Type == FieldType.Integer || field.Type == FieldType.Single || field.Type == FieldType.Double || field.Type == FieldType.SmallInteger) {
                         _listOfFields.Add(field);
@@ -486,8 +480,8 @@ namespace FieldStatsHelper
     public class ChartVisibilityDataAvailableConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if (value != null
-                && (value.GetType() == typeof(List<KeyValuePair<double, int>>))
-                && ((List<KeyValuePair<double, int>>)value).Count > 0) {
+                && (value.GetType() == typeof(List<ChartHistogramItem>))
+                && ((List<ChartHistogramItem>)value).Count > 0) {
                     return Visibility.Visible;
             }
             else return Visibility.Collapsed;
@@ -496,6 +490,52 @@ namespace FieldStatsHelper
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             throw new NotImplementedException();
+        }
+    }
+
+    public class ChartHistogramItem {
+        private int _count;
+        private double _rangeMin, _rangeMax;
+
+        /// <summary>
+        /// Create a new histogram item for a range of data values
+        /// </summary>
+        /// <param name="count">How many items in the range</param>
+        /// <param name="rangeMin">The range's smallest value</param>
+        /// <param name="rangeMax">The range's largest value</param>
+        public ChartHistogramItem(int count, double rangeMin, double rangeMax) {
+            this.Count = count;
+            this.RangeMin = rangeMin;
+            this.RangeMax = rangeMax;
+        }
+        public int Count {
+            get {
+                return _count;
+            }
+
+            set {
+                _count = value;
+            }
+        }
+
+        public double RangeMax {
+            get {
+                return _rangeMax;
+            }
+
+            set {
+                _rangeMax = value;
+            }
+        }
+
+        public double RangeMin {
+            get {
+                return _rangeMin;
+            }
+
+            set {
+                _rangeMin = value;
+            }
         }
     }
 }

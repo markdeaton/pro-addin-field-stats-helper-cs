@@ -135,7 +135,7 @@
                 <chartingToolkit:LinearAxis Orientation="Y" Title="Number of Records"></chartingToolkit:LinearAxis>
             </chartingToolkit:Chart.Axes>
 
-            <chartingToolkit:ColumnSeries x:Name="columnSeriesHistogram" IndependentValuePath="Key" DependentValuePath="Value" ItemsSource="{Binding Path=ChartData}"
+            <chartingToolkit:ColumnSeries x:Name="columnSeriesHistogram" IndependentValuePath="RangeMax" DependentValuePath="Count" ItemsSource="{Binding Path=ChartData}"
                                           Background="Transparent"/>
 
             <chartingToolkit:Chart.LegendStyle>
