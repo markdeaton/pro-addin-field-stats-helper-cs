@@ -64,7 +64,16 @@ namespace FieldStatsHelper {
                         _fieldMedian = Double.NaN, _fieldStdDev = Double.NaN;
         private int _fieldNulls = int.MinValue;
 
+        // Histogram range
+        private double _rangeMin, _rangeMax, _rangeLowerVal, _rangeUpperVal;
+
+        // SQL clause
+        private string _sqlClause = String.Empty;
+
         private ICommand _retrieveMapsCommand;
+        private ICommand _addSqlClause;
+        private ICommand _clearSql;
+        private ICommand _applyQuery;
 
         #endregion
 
@@ -186,13 +195,35 @@ namespace FieldStatsHelper {
                 double medianAbsoluteDeviation = Statistics.Median(tempValues);
 
                 Histogram histogram = new Histogram(values, 25);
+
                 ChartData = new List<ChartHistogramItem>();
                 for (int i = 0; i < histogram.BucketCount; i++) {
                     ChartData.Add(new ChartHistogramItem((int)histogram[i].Count, histogram[i].LowerBound, histogram[i].UpperBound));
                 }
+
+                RangeMin = RangeLowerVal = FieldMin;
+                RangeMax = RangeUpperVal = FieldMax;
             });
         }
 
+        private void AddSqlClause() {
+            string clause = SqlWhereClause.Length > 0 ? " AND " : String.Empty;
+            clause += "(" 
+                + SelectedField.Name + " BETWEEN "
+                + RangeLowerVal + " AND " + RangeUpperVal 
+                + ")";
+
+            SqlWhereClause += clause;
+        }
+        private void ClearSql() {
+            SqlWhereClause = String.Empty;
+            ApplyQuery();
+        }
+        private void ApplyQuery() {
+            QueuedTask.Run(() => {
+                SelectedLayer.SetDefinitionQuery(SqlWhereClause);
+            });
+        }
         public double FieldMin {
             get {
                 return _fieldMin;
@@ -257,6 +288,9 @@ namespace FieldStatsHelper {
         /// Implement a 'RelayCommand' to retrieve all maps from the current project
         /// </summary>
         public ICommand RetrieveMapsCommand => _retrieveMapsCommand;
+        public ICommand AddSqlClauseCommand => _addSqlClause;
+        public ICommand ClearSqlCommand => _clearSql;
+        public ICommand ApplyQueryCommand => _applyQuery;
 
         #endregion
 
@@ -274,6 +308,10 @@ namespace FieldStatsHelper {
 
             // set up the command to retrieve the maps
             _retrieveMapsCommand = new RelayCommand(() => RetrieveMaps(), () => true);
+            // set up the command to add a sql clause
+            _addSqlClause = new RelayCommand(() => AddSqlClause(), () => true);
+            _clearSql = new RelayCommand(() => ClearSql(), () => true);
+            _applyQuery = new RelayCommand(() => ApplyQuery(), () => true);
         }
 
         #endregion
@@ -311,6 +349,56 @@ namespace FieldStatsHelper {
             set
             {
                 SetProperty(ref _heading, value);
+            }
+        }
+
+        public double RangeMin {
+            get {
+                return _rangeMin;
+            }
+
+            set {
+                SetProperty(ref _rangeMin, value);
+            }
+        }
+
+        public double RangeMax {
+            get {
+                return _rangeMax;
+            }
+
+            set {
+                SetProperty(ref _rangeMax, value);
+            }
+        }
+
+        public double RangeLowerVal {
+            get {
+                return _rangeLowerVal;
+            }
+
+            set {
+                SetProperty(ref _rangeLowerVal, value);
+            }
+        }
+
+        public double RangeUpperVal {
+            get {
+                return _rangeUpperVal;
+            }
+
+            set {
+                SetProperty(ref _rangeUpperVal, value);
+            }
+        }
+
+        public string SqlWhereClause {
+            get {
+                return _sqlClause;
+            }
+
+            set {
+                SetProperty(ref _sqlClause, value);
             }
         }
 
@@ -402,7 +490,6 @@ namespace FieldStatsHelper {
 
         private void UpdateLayers(Map map) {
             // get the layers.  GetLayers needs to be on MCT but want to refresh members and properties on UI thread
-
             System.Diagnostics.Debug.WriteLine("UpdateLayers");
             _listOfLayers.Clear();
             System.Diagnostics.Debug.WriteLine("UpdateLayers list cleared");
@@ -486,6 +573,19 @@ namespace FieldStatsHelper {
             }
             else return Visibility.Collapsed;
 
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotImplementedException();
+        }
+    }
+
+    [ValueConversion(typeof(double), typeof(string))]
+    public class SliderLabelDoubleToStringConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            if (value != null && value.GetType() == typeof(double)) {
+                return Math.Round((double)value, 2);
+            } else return value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {

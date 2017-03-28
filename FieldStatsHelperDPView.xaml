@@ -9,6 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="300"
              xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+             xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
              xmlns:conv="clr-namespace:FieldStatsHelper">
     <!--//Copyright 2014 Esri
 
@@ -27,6 +28,7 @@
         <conv:FieldStatDoubleToStringConverter x:Key="statStringToDoubleConverter"/>
         <conv:FieldNullIntToStringConverter x:Key="nullIntToStringConverter"/>
         <conv:ChartVisibilityDataAvailableConverter x:Key="chartVisibilityDataAvailConverter"/>
+        <conv:SliderLabelDoubleToStringConverter x:Key="sliderDoubleToStringConverter"/>
         <ResourceDictionary x:Key="MergedDictionaries">
             <ResourceDictionary.MergedDictionaries>
                 <extensions:DesignOnlyResourceDictionary Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml"/>
@@ -36,6 +38,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -109,40 +112,68 @@
             <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding FieldNulls, StringFormat=0;, Converter={StaticResource nullIntToStringConverter}}" 
                      IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
         </Grid>
-        <chartingToolkit:Chart
-            Grid.Row="3"
-            Margin="2, 2, 2, 2" x:Name="chtHistogram" 
-            Height="320" Width="275"
-            Title="{Binding Path=ChartTitle}"
-            Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
-            <chartingToolkit:Chart.TitleStyle>
-                <Style TargetType="datavis:Title">
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-                    <Setter Property="TextBlock.LineHeight" Value="20"/>
-                </Style>
-            </chartingToolkit:Chart.TitleStyle>
-            
-            <chartingToolkit:Chart.PlotAreaStyle>
-                <Style TargetType="Grid">
-                    <Setter Property="Background" Value="Gray"/>
-                    <Setter Property="Opacity" Value="0.15"/>
-                </Style>
-            </chartingToolkit:Chart.PlotAreaStyle>
-            <chartingToolkit:Chart.Axes>
-                <chartingToolkit:LinearAxis Orientation="X"></chartingToolkit:LinearAxis>
-                <chartingToolkit:LinearAxis Orientation="Y" Title="Number of Records"></chartingToolkit:LinearAxis>
-            </chartingToolkit:Chart.Axes>
+        <Grid x:Name="chartAndSliderGroup" Grid.Row="3"
+                    Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <chartingToolkit:Chart
+                    Grid.Row="0" Grid.ColumnSpan="3"
+                    Margin="2, 2, 2, 2" x:Name="chtHistogram" 
+                    Height="200" Width="275"
+                    Title="{Binding Path=ChartTitle}">
+                <chartingToolkit:Chart.TitleStyle>
+                    <Style TargetType="datavis:Title">
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                        <Setter Property="TextBlock.LineHeight" Value="20"/>
+                    </Style>
+                </chartingToolkit:Chart.TitleStyle>
 
-            <chartingToolkit:ColumnSeries x:Name="columnSeriesHistogram" IndependentValuePath="RangeMax" DependentValuePath="Count" ItemsSource="{Binding Path=ChartData}"
-                                          Background="Transparent"/>
+                <chartingToolkit:Chart.PlotAreaStyle>
+                    <Style TargetType="Grid">
+                        <Setter Property="Background" Value="Gray"/>
+                        <Setter Property="Opacity" Value="0.15"/>
+                    </Style>
+                </chartingToolkit:Chart.PlotAreaStyle>
+                <chartingToolkit:Chart.Axes>
+                    <chartingToolkit:LinearAxis Orientation="X"></chartingToolkit:LinearAxis>
+                    <chartingToolkit:LinearAxis Orientation="Y" Title="Number of Records"></chartingToolkit:LinearAxis>
+                </chartingToolkit:Chart.Axes>
 
-            <chartingToolkit:Chart.LegendStyle>
-                <Style TargetType="datavis:Legend">
-                    <Setter Property="Width" Value="0"/>
-                </Style>
-            </chartingToolkit:Chart.LegendStyle>
-        </chartingToolkit:Chart>
+                <chartingToolkit:ColumnSeries x:Name="columnSeriesHistogram" IndependentValuePath="RangeMax" DependentValuePath="Count" ItemsSource="{Binding Path=ChartData}"
+                                                  Background="Transparent"/>
+
+                <chartingToolkit:Chart.LegendStyle>
+                    <Style TargetType="datavis:Legend">
+                        <Setter Property="Width" Value="0"/>
+                    </Style>
+                </chartingToolkit:Chart.LegendStyle>
+            </chartingToolkit:Chart>
+            <xceed:RangeSlider Grid.Row="1" Grid.ColumnSpan="3"
+                               Minimum="{Binding Mode=TwoWay, Path=RangeMin}" Maximum="{Binding Mode=TwoWay, Path=RangeMax}" 
+                               LowerValue="{Binding Mode=TwoWay, Path=RangeLowerVal}" HigherValue="{Binding Mode=TwoWay, Path=RangeUpperVal}"/>
+            <Label Grid.Row="2" Grid.Column="0" Content="{Binding Path=RangeLowerVal, Converter={StaticResource ResourceKey=sliderDoubleToStringConverter}}"/>
+            <Label Grid.Row="2" Grid.Column="2" Content="{Binding Path=RangeUpperVal, Converter={StaticResource ResourceKey=sliderDoubleToStringConverter}}" HorizontalAlignment="Right"/>
+            <Button Grid.Row="3" Grid.Column="0" Content="Clear SQL"
+                    Style="{DynamicResource Esri_SimpleButton}"
+                    Command="{Binding ClearSqlCommand}"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="Apply Query"
+                    Style="{DynamicResource Esri_SimpleButton}"
+                    Command="{Binding ApplyQueryCommand}"/>
+            <Button Grid.Row="3" Grid.Column="2" Content="Add Clause" 
+                    Style="{DynamicResource Esri_SimpleButton}"
+                    Command="{Binding AddSqlClauseCommand}"/>
+        </Grid>
+        <TextBox Grid.Row="4" TextWrapping="Wrap" Text="{Binding Path=SqlWhereClause, Mode=TwoWay}"/>
     </Grid>
 </UserControl>
