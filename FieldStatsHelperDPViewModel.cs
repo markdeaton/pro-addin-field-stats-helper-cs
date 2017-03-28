@@ -107,7 +107,7 @@ namespace FieldStatsHelper {
 
         public string ChartTitle {
             get {
-                return "Histogram\n[" + SelectedField?.Name + "]";
+                return "2. Specify one or more range filters"; //\n[" + SelectedField?.Name + "]";
             }
         }
         /// <summary>
@@ -137,12 +137,8 @@ namespace FieldStatsHelper {
             set {
                 SetProperty(ref _selectedLayer, value);
                 System.Diagnostics.Debug.WriteLine("selected layer");
-                if (_selectedLayer != null) {
-                    // Get fields in the feature layer
-                    QueuedTask.Run(() => {
-                        UpdateFields(_selectedLayer);
-                    });
-                }
+                // Get fields in the feature layer
+                UpdateFields(_selectedLayer);
             }
         }
 
@@ -183,10 +179,12 @@ namespace FieldStatsHelper {
                         } else // Note the null value
                             nulls.Add(long.MinValue);
                 }
-                FieldMedian = Statistics.Median(values);
-                FieldMean = Statistics.Mean(values);
-                FieldMin = Statistics.Minimum(values);
-                FieldMax = Statistics.Maximum(values);
+                values.Sort();
+                double[] aryValues = values.ToArray();
+                FieldMedian = SortedArrayStatistics.Median(aryValues);
+                FieldMean = ArrayStatistics.Mean(aryValues);
+                FieldMin = SortedArrayStatistics.Minimum(aryValues);
+                FieldMax = SortedArrayStatistics.Maximum(aryValues);
                 FieldStdDev = Statistics.StandardDeviation(values);
                 FieldNulls = nulls.Count;
 
@@ -207,7 +205,7 @@ namespace FieldStatsHelper {
         }
 
         private void AddSqlClause() {
-            string clause = SqlWhereClause.Length > 0 ? " AND " : String.Empty;
+            string clause = SqlWhereClause.Length > 0 ? "\n\nAND " : String.Empty;
             clause += "(" 
                 + SelectedField.Name + " BETWEEN "
                 + RangeLowerVal + " AND " + RangeUpperVal 
@@ -325,6 +323,8 @@ namespace FieldStatsHelper {
         protected override Task InitializeAsync()
         {
             ProjectItemsChangedEvent.Subscribe(OnProjectCollectionChanged, false);
+            ProjectOpenedEvent.Subscribe(OnProjectOpened, false);
+            ProjectClosedEvent.Subscribe(OnProjectClosed, false);
             return base.InitializeAsync();
         }
         #endregion
@@ -342,9 +342,8 @@ namespace FieldStatsHelper {
         /// <summary>
         /// Text shown near the top of the DockPane.
         /// </summary>
-        private string _heading = "Maps and Bookmarks";
-        public string Heading
-        {
+        private string _heading = "1. Choose a Map, Layer, and Field";
+        public string Heading {
             get { return _heading; }
             set
             {
@@ -407,6 +406,22 @@ namespace FieldStatsHelper {
         #region Subscribed Events
 
         /// <summary>
+        /// Listen to when a project document is closed; clear out maps list
+        /// </summary>
+        /// <param name="args"></param>
+        private void OnProjectClosed(ProjectEventArgs args) {
+            _listOfMaps.Clear();
+        }
+
+        /// <summary>
+        /// Listen to when a project document is opened; clear out maps list
+        /// </summary>
+        /// <param name="args"></param>
+        private void OnProjectOpened(ProjectEventArgs args) {
+            RetrieveMaps();
+        }
+        
+        /// <summary>
         /// Subscribe to Project Items Changed events which is getting called each
         /// time the project items change which happens when a new map is added or removed in ArcGIS Pro
         /// </summary>
@@ -420,39 +435,34 @@ namespace FieldStatsHelper {
                 return;
 
             // new project item was added
-            switch (args.Action)
-            {
+            switch (args.Action)  {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    {
-                        var foundItem = _listOfMaps.FirstOrDefault(m => m.URI == mapItem.Path);
-                        // one cannot be found; so add it to our list
-                        if (foundItem == null)
-                        {
-                            _listOfMaps.Add(mapItem.GetMap());
-                        }
+                    // TODO It might seem like a duplicate item if the user has opened a new document with the same-named map in it
+
+                    var foundItem = _listOfMaps.FirstOrDefault(m => m.URI == mapItem.Path);
+                    // one cannot be found; so add it to our list
+                    if (foundItem == null) {
+                        _listOfMaps.Add(mapItem.GetMap());
                     }
+                    System.Diagnostics.Debug.WriteLine("Map added");
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    {
-                        Map map = mapItem.GetMap();
-                        // if this is the selected map, resest
-                        if (SelectedMap == map)
-                            SelectedMap = null;
+                    Map map = mapItem.GetMap();
+                    // if this is the selected map, resest
+                    if (SelectedMap == map) SelectedMap = null;
 
-                        // remove from the collection
-                        if (_listOfMaps.Contains(map))
-                        {
-                            _listOfMaps.Remove(map);
-                        }
+                    // remove from the collection
+                    if (_listOfMaps.Contains(map)) {
+                        _listOfMaps.Remove(map);
                     }
+                    System.Diagnostics.Debug.WriteLine("Map removed");
                     break;
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset: {
-                        _listOfMaps.Clear();
-                    }
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    _listOfMaps.Clear();
+                    System.Diagnostics.Debug.WriteLine("Maps reset");
                     break;
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace: {
-                        System.Diagnostics.Debug.WriteLine("Maps list replace");
-                    }
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    System.Diagnostics.Debug.WriteLine("Maps list replace");
                     break;
                 default:
                     System.Diagnostics.Debug.WriteLine("Maps list other");
@@ -509,7 +519,7 @@ namespace FieldStatsHelper {
 
         private void UpdateFields(FeatureLayer layer) {
             System.Diagnostics.Debug.WriteLine("UpdateFields");
-            _listOfFields.Clear();
+            _listOfFields.Clear(); ChartData = null;
             System.Diagnostics.Debug.WriteLine("UpdateFields list cleared");
             if (layer == null) {
                 System.Diagnostics.Debug.WriteLine("No feature layer selected");
@@ -586,6 +596,17 @@ namespace FieldStatsHelper {
             if (value != null && value.GetType() == typeof(double)) {
                 return Math.Round((double)value, 2);
             } else return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotImplementedException();
+        }
+    }
+
+    [ValueConversion(typeof(object), typeof(Visibility))]
+    public class NullToVisibilityConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            return value == null ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
