@@ -31,6 +31,7 @@
         <conv:ChartVisibilityDataAvailableConverter x:Key="chartVisibilityDataAvailConverter"/>
         <conv:SliderLabelDoubleToStringConverter x:Key="sliderDoubleToStringConverter"/>
         <conv:NullToVisibilityConverter x:Key="nullToVisibilityConverter"/>
+        <conv:SliderValueDoubleToFixedDecimalConverter x:Key="sliderFixedDecimalConverter"/>
         <ResourceDictionary x:Key="MergedDictionaries">
             <ResourceDictionary.MergedDictionaries>
                 <extensions:DesignOnlyResourceDictionary Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml"/>
@@ -95,7 +96,6 @@
                            IsHitTestVisible="False"
                            Text="&lt;Select a Field&gt;"/>
         </Grid>
-        <Line/>
         <Grid x:Name="descriptiveStatsGroup" Grid.Row="2"
               Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
             <Grid.RowDefinitions>
@@ -105,29 +105,40 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Content="Min:"/>
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FieldMin, Converter={StaticResource statStringToDoubleConverter}, StringFormat=0.000;;0}" 
-                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
-            <Label Grid.Row="0" Grid.Column="2" Content="Max:"/>
-            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding FieldMax, Converter={StaticResource statStringToDoubleConverter}, StringFormat=0.000;;0}" 
-                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
-            <Label Grid.Row="1" Grid.Column="0" Content="Mean:"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding FieldMean, Converter={StaticResource statStringToDoubleConverter}, StringFormat=0.000;;0}" 
-                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
-            <Label Grid.Row="1" Grid.Column="2" Content="Median:"/>
-            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding FieldMedian, Converter={StaticResource statStringToDoubleConverter}, StringFormat=0.000;;0}" 
-                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
-            <Label Grid.Row="2" Grid.Column="0" Content="Std Dev:"/>
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FieldStdDev, Converter={StaticResource statStringToDoubleConverter}, StringFormat=0.000;;0}" 
-                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
-            <Label Grid.Row="2" Grid.Column="2" Content="Nulls Ignored:"/>
-            <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding FieldNulls, Converter={StaticResource nullIntToStringConverter}, StringFormat=0;}" 
-                     IsReadOnly="True" Margin="5,0" BorderThickness="0" MaxLines="1" Background="Transparent"/>
+            <!--<Separator Grid.Column="1" Grid.RowSpan="3" Width="2" Height="300" HorizontalAlignment="Right" VerticalAlignment="Stretch" Background="Black" />-->
+            <Border Grid.Row="0" Grid.ColumnSpan="4" Width="Auto" Background="Transparent" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource Esri_Gray130}"/>
+            <Border Grid.Row="5" Grid.ColumnSpan="4" Width="Auto" Background="Transparent" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Esri_Gray130}"/>
+            <Border Grid.Column="1" Grid.RowSpan="3" Background="Transparent" BorderThickness="0,0,1,0" Height="Auto" BorderBrush="{DynamicResource Esri_Gray130}"/>
+            
+            <Label Grid.Row="0" Grid.Column="0" Content="Min:" FontWeight="Bold" Margin="0,0,0,1" VerticalAlignment="Bottom"/>
+            <Label Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMin}">
+                <TextBlock Text="{Binding FieldMin, StringFormat=0.000}"/>
+            </Label> 
+                     
+            <Label Grid.Row="0" Grid.Column="2" Content="Max:" FontWeight="Bold"/>
+            <Label Grid.Row="0" Grid.Column="3" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMax}">
+                <TextBlock Text="{Binding FieldMax, StringFormat=0.000}"/>
+            </Label>
+            <Label Grid.Row="1" Grid.Column="0" Content="Mean:" FontWeight="Bold"/>
+            <Label Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMean}">
+                <TextBlock Text="{Binding FieldMean, StringFormat=0.000}"/>
+            </Label>
+            <Label Grid.Row="1" Grid.Column="2" Content="Median:" FontWeight="Bold"/>
+            <Label Grid.Row="1" Grid.Column="3" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMedian}">
+                <TextBlock Text="{Binding FieldMedian, StringFormat=0.000}"/>
+            </Label>
+            <Label Grid.Row="2" Grid.Column="0" Content="Std Dev:" FontWeight="Bold"/>
+            <Label Grid.Row="2" Grid.Column="1" ToolTip="{Binding FieldStdDev}" HorizontalContentAlignment="Right">
+                <TextBlock Text="{Binding FieldStdDev, StringFormat=0.000}"/>
+            </Label>
+            <Label Grid.Row="2" Grid.Column="2" Content="Nulls Ignored:" FontWeight="Bold"/>
+            <Label Grid.Row="2" Grid.Column="3" Content="{Binding FieldNulls, StringFormat=0;}" HorizontalContentAlignment="Right"/>
+            
         </Grid>
         <Grid x:Name="chartAndSliderGroup" Grid.Row="3"
                     Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
@@ -179,10 +190,12 @@
 
             </chartingToolkit:Chart>
             <xceed:RangeSlider Grid.Row="1" Grid.ColumnSpan="3"
-                               Minimum="{Binding RangeMin, Mode=TwoWay}" Maximum="{Binding RangeMax, Mode=TwoWay}" 
-                               LowerValue="{Binding RangeLowerVal, Mode=TwoWay}" HigherValue="{Binding RangeUpperVal, Mode=TwoWay}" Margin="52,0,25,0"/>
-            <Label Grid.Row="2" Grid.Column="0" Margin="52,0,0,0" Content="{Binding RangeLowerVal, Converter={StaticResource ResourceKey=sliderDoubleToStringConverter}}"/>
-            <Label Grid.Row="2" Grid.Column="2" Margin="0,0,25,0" Content="{Binding RangeUpperVal, Converter={StaticResource ResourceKey=sliderDoubleToStringConverter}}" HorizontalAlignment="Right"/>
+                               Minimum="{Binding RangeMin, Mode=TwoWay, Converter={StaticResource sliderFixedDecimalConverter}}" 
+                               Maximum="{Binding RangeMax, Mode=TwoWay, Converter={StaticResource sliderFixedDecimalConverter}}" 
+                               LowerValue="{Binding RangeLowerVal, Mode=TwoWay, Converter={StaticResource sliderFixedDecimalConverter}}" 
+                               HigherValue="{Binding RangeUpperVal, Mode=TwoWay, Converter={StaticResource sliderFixedDecimalConverter}}" Margin="52,0,25,0"/>
+            <Label Grid.Row="2" Grid.Column="0" Margin="52,0,0,0" Content="{Binding RangeLowerVal, Converter={StaticResource sliderFixedDecimalConverter}}"/>
+            <Label Grid.Row="2" Grid.Column="2" Margin="0,0,25,0" Content="{Binding RangeUpperVal, Converter={StaticResource sliderFixedDecimalConverter}}" HorizontalAlignment="Right"/>
             <Button Grid.Row="3" Grid.Column="0" Content="Clear SQL"
                     Style="{DynamicResource Esri_SimpleButton}"
                     Command="{Binding ClearSqlCommand}"/>

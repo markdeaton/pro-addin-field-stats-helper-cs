@@ -137,6 +137,7 @@ namespace FieldStatsHelper {
             set {
                 SetProperty(ref _selectedLayer, value);
                 System.Diagnostics.Debug.WriteLine("selected layer");
+                ClearSql();
                 // Get fields in the feature layer
                 UpdateFields(_selectedLayer);
             }
@@ -199,17 +200,16 @@ namespace FieldStatsHelper {
                     ChartData.Add(new ChartHistogramItem((int)histogram[i].Count, histogram[i].LowerBound, histogram[i].UpperBound));
                 }
 
-                RangeMin = RangeLowerVal = FieldMin;
-                RangeMax = RangeUpperVal = FieldMax;
+                // Get min/max values rounded down/up to 3 decimal places
+                RangeMin = RangeLowerVal = Math.Floor(FieldMin * 1000) / 1000;
+                RangeMax = RangeUpperVal = Math.Ceiling(FieldMax * 1000) / 1000;
             });
         }
 
         private void AddSqlClause() {
-            string clause = SqlWhereClause.Length > 0 ? "\n\nAND " : String.Empty;
-            clause += "(" 
-                + SelectedField.Name + " BETWEEN "
-                + RangeLowerVal + " AND " + RangeUpperVal 
-                + ")";
+            string clause = SqlWhereClause.Length > 0 ? "\nAND\n" : String.Empty;
+            clause += SelectedField.Name + " BETWEEN "
+                + RangeLowerVal + " AND " + RangeUpperVal;
 
             SqlWhereClause += clause;
         }
@@ -219,7 +219,7 @@ namespace FieldStatsHelper {
         }
         private void ApplyQuery() {
             QueuedTask.Run(() => {
-                SelectedLayer.SetDefinitionQuery(SqlWhereClause);
+                SelectedLayer?.SetDefinitionQuery(SqlWhereClause);
             });
         }
         public double FieldMin {
@@ -437,8 +437,6 @@ namespace FieldStatsHelper {
             // new project item was added
             switch (args.Action)  {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    // TODO It might seem like a duplicate item if the user has opened a new document with the same-named map in it
-
                     var foundItem = _listOfMaps.FirstOrDefault(m => m.URI == mapItem.Path);
                     // one cannot be found; so add it to our list
                     if (foundItem == null) {
@@ -477,7 +475,7 @@ namespace FieldStatsHelper {
         /// <summary>
         /// Method for retrieving map items in the project.
         /// </summary>
-        private void RetrieveMaps()
+        private void  RetrieveMaps()
         {
             System.Diagnostics.Debug.WriteLine("RetrieveMaps");
             // clear the collections
@@ -594,12 +592,27 @@ namespace FieldStatsHelper {
     public class SliderLabelDoubleToStringConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if (value != null && value.GetType() == typeof(double)) {
-                return Math.Round((double)value, 2);
+                return Math.Round((double)value, 3);
             } else return value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             throw new NotImplementedException();
+        }
+    }
+
+    [ValueConversion(typeof(double), typeof(double))]
+    public class SliderValueDoubleToFixedDecimalConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            if (value.GetType() == typeof(double)) {
+                return Math.Round((double)value, 3);
+            } else return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            if (value.GetType() == typeof(double)) {
+                return Math.Round((double)value, 3);
+            } else return value;
         }
     }
 
