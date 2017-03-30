@@ -42,12 +42,12 @@
       </groups>
       <controls>
         <!-- add your controls here -->
-        <button id="FieldStatsHelperDP_ShowButton" caption="Query Builder" className="FieldStatsHelperDP_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
+        <button id="FieldStatsHelperDP_ShowButton" caption="Query Helper" className="FieldStatsHelperDP_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
           <tooltip>Build a definition query based on field data distribution statistics<disabledText /></tooltip>
         </button>
       </controls>
       <dockPanes>
-        <dockPane id="FieldStatsHelper_DockPane" caption="Field Statistics Query Builder" className="FieldStatsHelperDPViewModel" keytip="DockPane" initiallyVisible="true" dock="group" dockWith="esri_core_contentsDockPane">
+        <dockPane id="FieldStatsHelper_DockPane" caption="Field Statistics Query Helper" className="FieldStatsHelperDPViewModel" keytip="DockPane" initiallyVisible="true" dock="group" dockWith="esri_core_contentsDockPane">
           <content className="FieldStatsHelperDPView" />
         </dockPane>
       </dockPanes>
