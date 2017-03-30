@@ -190,8 +190,8 @@
 
             </chartingToolkit:Chart>
             <xceed:RangeSlider Grid.Row="1" Grid.ColumnSpan="3"
-                               Minimum="{Binding RangeMin, Mode=TwoWay, Converter={StaticResource sliderFixedDecimalConverter}}" 
-                               Maximum="{Binding RangeMax, Mode=TwoWay, Converter={StaticResource sliderFixedDecimalConverter}}" 
+                               Minimum="{Binding RangeMin, Converter={StaticResource sliderFixedDecimalConverter}}" 
+                               Maximum="{Binding RangeMax, Converter={StaticResource sliderFixedDecimalConverter}}" 
                                LowerValue="{Binding RangeLowerVal, Mode=TwoWay, Converter={StaticResource sliderFixedDecimalConverter}}" 
                                HigherValue="{Binding RangeUpperVal, Mode=TwoWay, Converter={StaticResource sliderFixedDecimalConverter}}" Margin="52,0,25,0"/>
             <Label Grid.Row="2" Grid.Column="0" Margin="52,0,0,0" Content="{Binding RangeLowerVal, Converter={StaticResource sliderFixedDecimalConverter}}"/>

@@ -31,22 +31,21 @@ using System.Windows.Data;
 using System.Windows.Input;
 
 namespace FieldStatsHelper {
+    /// <summary>
+    /// View Model
+    /// </summary>
     internal class FieldStatsHelperDPViewModel : DockPane
     {
         #region Private Properties
         private const string DockPaneId = "FieldStatsHelper_DockPane";
 
-        /// <summary>
-        /// used to lock collections for use by multiple threads
-        /// </summary>
+        // Lock collections for use by multiple threads
         private readonly object _lockMapCollections = new object();
         private readonly object _lockLayerCollections = new object();
         private readonly object _lockFieldCollections = new object();
 
 
-        /// <summary>
-        /// UI lists, readonly collections, and properties
-        /// </summary>
+        // UI lists, readonly collections, and properties
         private readonly ObservableCollection<Map> _listOfMaps = new ObservableCollection<Map>();
         private readonly ObservableCollection<FeatureLayer> _listOfLayers = new ObservableCollection<FeatureLayer>();
         private readonly ObservableCollection<FieldDescription> _listOfFields = new ObservableCollection<FieldDescription>();
@@ -70,6 +69,7 @@ namespace FieldStatsHelper {
         // SQL clause
         private string _sqlClause = String.Empty;
 
+        // Handlers for buttons on the dockpane
         private ICommand _retrieveMapsCommand;
         private ICommand _addSqlClause;
         private ICommand _clearSql;
@@ -110,9 +110,7 @@ namespace FieldStatsHelper {
                 return "2. Specify one or more range filters"; //\n[" + SelectedField?.Name + "]";
             }
         }
-        /// <summary>
-        /// This is where we store the selected map 
-        /// </summary>
+
         public Map SelectedMap {
             get { return _selectedMap; }
             set {
@@ -125,7 +123,7 @@ namespace FieldStatsHelper {
                         Utils.OpenAndActivateMap(_selectedMap.URI);
                     }
                 });
-                System.Diagnostics.Debug.WriteLine("selected map opened and activated map");
+                System.Diagnostics.Debug.WriteLine("opened and activated map");
                 // no need to await
                 UpdateLayers(_selectedMap);
                 System.Diagnostics.Debug.WriteLine("updated layers");
@@ -143,9 +141,6 @@ namespace FieldStatsHelper {
             }
         }
 
-        /// <summary>
-        /// This is where we store the selected Field 
-        /// </summary>
         public FieldDescription SelectedField {
             get { return _selectedField; }
             set {
@@ -159,6 +154,9 @@ namespace FieldStatsHelper {
             }
         }
 
+        /// <summary>
+        /// A new field has been selected in the dropdown; find and display its stats
+        /// </summary>
         private void UpdateFieldStats() {
             // GetMap needs to be on the MCT
             QueuedTask.Run(() => {
@@ -190,8 +188,8 @@ namespace FieldStatsHelper {
                 FieldNulls = nulls.Count;
 
                 // Find median absolute deviation
-                IEnumerable<double> tempValues = values.Select(value => Math.Abs(value - FieldMedian));
-                double medianAbsoluteDeviation = Statistics.Median(tempValues);
+                //IEnumerable<double> tempValues = values.Select(value => Math.Abs(value - FieldMedian));
+                //double medianAbsoluteDeviation = Statistics.Median(tempValues);
 
                 Histogram histogram = new Histogram(values, 25);
 
@@ -199,7 +197,7 @@ namespace FieldStatsHelper {
                 for (int i = 0; i < histogram.BucketCount; i++) {
                     ChartData.Add(new ChartHistogramItem((int)histogram[i].Count, histogram[i].LowerBound, histogram[i].UpperBound));
                 }
-
+                
                 // Get min/max values rounded down/up to 3 decimal places
                 RangeMin = RangeLowerVal = Math.Floor(FieldMin * 1000) / 1000;
                 RangeMax = RangeUpperVal = Math.Ceiling(FieldMax * 1000) / 1000;
@@ -222,6 +220,7 @@ namespace FieldStatsHelper {
                 SelectedLayer?.SetDefinitionQuery(SqlWhereClause);
             });
         }
+
         public double FieldMin {
             get {
                 return _fieldMin;
@@ -282,9 +281,8 @@ namespace FieldStatsHelper {
             }
         }
 
-        /// <summary>
-        /// Implement a 'RelayCommand' to retrieve all maps from the current project
-        /// </summary>
+        // Implement RelayCommands for buttons on the DockPane
+        // (using a regular OnClick event would break the MVVM pattern)
         public ICommand RetrieveMapsCommand => _retrieveMapsCommand;
         public ICommand AddSqlClauseCommand => _addSqlClause;
         public ICommand ClearSqlCommand => _clearSql;
@@ -317,9 +315,8 @@ namespace FieldStatsHelper {
         #region Overrides
 
         /// <summary>
-        /// Override to implement custom initialization code for this dockpane
+        /// Set up project document event handlers
         /// </summary>
-        /// <returns></returns>
         protected override Task InitializeAsync()
         {
             ProjectItemsChangedEvent.Subscribe(OnProjectCollectionChanged, false);
@@ -331,7 +328,7 @@ namespace FieldStatsHelper {
 
         #region Show dockpane 
         /// <summary>
-        /// Show the DockPane.
+        /// Show the DockPane
         /// </summary>
         internal static void Show()
         {
@@ -340,7 +337,7 @@ namespace FieldStatsHelper {
         }
 
         /// <summary>
-        /// Text shown near the top of the DockPane.
+        /// Text shown near the top of the DockPane
         /// </summary>
         private string _heading = "1. Choose a Map, Layer, and Field";
         public string Heading {
@@ -351,6 +348,10 @@ namespace FieldStatsHelper {
             }
         }
 
+        /// <summary>
+        /// The range slider's minimum possible value
+        /// (different from FieldMin because of rounding/floor function)
+        /// </summary>
         public double RangeMin {
             get {
                 return _rangeMin;
@@ -361,6 +362,10 @@ namespace FieldStatsHelper {
             }
         }
 
+        /// <summary>
+        /// The range slider's maximum possible value
+        /// (different from FieldMax because of rounding/ceiling function)
+        /// </summary>
         public double RangeMax {
             get {
                 return _rangeMax;
@@ -371,6 +376,9 @@ namespace FieldStatsHelper {
             }
         }
 
+        /// <summary>
+        /// The lower value selected on the range slider
+        /// </summary>
         public double RangeLowerVal {
             get {
                 return _rangeLowerVal;
@@ -381,6 +389,9 @@ namespace FieldStatsHelper {
             }
         }
 
+        /// <summary>
+        /// The upper value selected on the range slider
+        /// </summary>
         public double RangeUpperVal {
             get {
                 return _rangeUpperVal;
@@ -423,7 +434,7 @@ namespace FieldStatsHelper {
         
         /// <summary>
         /// Subscribe to Project Items Changed events which is getting called each
-        /// time the project items change which happens when a new map is added or removed in ArcGIS Pro
+        /// time the project items change, which happens when a new map is added or removed in ArcGIS Pro
         /// </summary>
         /// <param name="args">ProjectItemsChangedEventArgs</param>
         private void OnProjectCollectionChanged(ProjectItemsChangedEventArgs args)
@@ -473,7 +484,7 @@ namespace FieldStatsHelper {
         #region Private Helpers
 
         /// <summary>
-        /// Method for retrieving map items in the project.
+        /// Retrieve map items in the project
         /// </summary>
         private void  RetrieveMaps()
         {
@@ -496,6 +507,10 @@ namespace FieldStatsHelper {
             }
         }
 
+        /// <summary>
+        /// Get the list of layers from the newly selected map
+        /// </summary>
+        /// <param name="map"></param>
         private void UpdateLayers(Map map) {
             // get the layers.  GetLayers needs to be on MCT but want to refresh members and properties on UI thread
             System.Diagnostics.Debug.WriteLine("UpdateLayers");
@@ -515,6 +530,10 @@ namespace FieldStatsHelper {
             });
         }
 
+        /// <summary>
+        /// Get the list of numeric fields from the newly selected layer
+        /// </summary>
+        /// <param name="layer"></param>
         private void UpdateFields(FeatureLayer layer) {
             System.Diagnostics.Debug.WriteLine("UpdateFields");
             _listOfFields.Clear(); ChartData = null;

@@ -14,7 +14,7 @@
 //   limitations under the License.-->
 <ArcGIS defaultAssembly="FieldStatsHelper.dll" defaultNamespace="FieldStatsHelper" xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS%20Pro/bin/ArcGIS.Desktop.Framework.xsd">
   <AddInInfo id="{d1592631-bd40-4a10-a1a8-670c84f199e8}" version="1.0" desktopVersion="1.4.7198">
-    <Name>Field Stats Helper</Name>
+    <Name>Field Stats Query Helper</Name>
     <Description>Simple statistics on numeric fields</Description>
     <Image>Images\AddinDesktop32.png</Image>
     <Author>Mark Deaton</Author>
@@ -35,19 +35,19 @@
       <groups>
         <!-- comment this out if you have no controls on the Addin tab to avoid
               an empty group-->
-        <group id="FieldStatsHelper_Group1" caption="Field Statistics" appearsOnAddInTab="true">
+        <group id="FieldStatsHelper_Group1" caption="Field Stats Query Helper" appearsOnAddInTab="true">
           <!-- host controls within groups -->
           <button refID="FieldStatsHelperDP_ShowButton" size="large" />
         </group>
       </groups>
       <controls>
         <!-- add your controls here -->
-        <button id="FieldStatsHelperDP_ShowButton" caption="Field Stats" className="FieldStatsHelperDP_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
-          <tooltip heading="Show Dockpane">Show Dockpane<disabledText /></tooltip>
+        <button id="FieldStatsHelperDP_ShowButton" caption="Query Builder" className="FieldStatsHelperDP_ShowButton" loadOnClick="true" smallImage="Images\GenericButtonPurple16.png" largeImage="Images\GenericButtonPurple32.png">
+          <tooltip>Build a definition query based on field data distribution statistics<disabledText /></tooltip>
         </button>
       </controls>
       <dockPanes>
-        <dockPane id="FieldStatsHelper_DockPane" caption="Field Statistics" className="FieldStatsHelperDPViewModel" keytip="DockPane" initiallyVisible="true" dock="group" dockWith="esri_core_contentsDockPane">
+        <dockPane id="FieldStatsHelper_DockPane" caption="Field Statistics Query Builder" className="FieldStatsHelperDPViewModel" keytip="DockPane" initiallyVisible="true" dock="group" dockWith="esri_core_contentsDockPane">
           <content className="FieldStatsHelperDPView" />
         </dockPane>
       </dockPanes>
