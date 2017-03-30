@@ -23,7 +23,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace FieldStatsHelper {
+namespace Esri.APL.FieldStatsQueryHelper {
     public class Utils
     {
 

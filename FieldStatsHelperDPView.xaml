@@ -7,9 +7,9 @@
              xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-             xmlns:conv="clr-namespace:FieldStatsHelper" xmlns:Primitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit" x:Class="FieldStatsHelper.FieldStatsHelperDPView"
+             xmlns:conv="clr-namespace:Esri.APL.FieldStatsQueryHelper" xmlns:Primitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit" x:Class="Esri.APL.FieldStatsQueryHelper.FieldStatsHelperDPView"
              mc:Ignorable="d" 
-             d:DataContext="{Binding FieldStatsHelper.FieldStatsHelperDPViewModel}"
+             d:DataContext="{Binding FieldStatsHelperDPViewModel}"
              d:DesignHeight="300" d:DesignWidth="300"
              >
     <!--//Copyright 2014 Esri

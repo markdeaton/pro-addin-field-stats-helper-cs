@@ -30,7 +30,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace FieldStatsHelper {
+namespace Esri.APL.FieldStatsQueryHelper {
     /// <summary>
     /// View Model
     /// </summary>

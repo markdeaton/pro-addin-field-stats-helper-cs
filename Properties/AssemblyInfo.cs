@@ -23,11 +23,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Field Stats Helper")]
-[assembly: AssemblyDescription("A field statistics panel for ArcGIS Pro")]
+[assembly: AssemblyTitle("Field Stats Query Helper")]
+[assembly: AssemblyDescription("A field statistics definition query panel for ArcGIS Pro")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Esri Applications Prototype Lab")]
-[assembly: AssemblyProduct("FieldStatsHelper")]
+[assembly: AssemblyProduct("FieldStatsQueryHelper")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

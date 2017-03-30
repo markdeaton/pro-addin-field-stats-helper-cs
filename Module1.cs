@@ -14,8 +14,7 @@
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
 
-namespace FieldStatsHelper
-{   
+namespace Esri.APL.FieldStatsQueryHelper {   
     /// <summary>
     /// This sample shows how to: 
     /// * Create a Dockpane using DAML
