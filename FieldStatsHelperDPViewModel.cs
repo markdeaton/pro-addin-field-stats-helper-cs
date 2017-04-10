@@ -207,7 +207,7 @@ namespace Esri.APL.FieldStatsQueryHelper {
         private void AddSqlClause() {
             string clause = SqlWhereClause.Length > 0 ? "\nAND\n" : String.Empty;
             clause += SelectedField.Name + " BETWEEN "
-                + RangeLowerVal + " AND " + RangeUpperVal;
+                + Math.Round(RangeLowerVal, 3) + " AND " + Math.Round(RangeUpperVal, 3);
 
             SqlWhereClause += clause;
         }
@@ -322,6 +322,8 @@ namespace Esri.APL.FieldStatsQueryHelper {
             ProjectItemsChangedEvent.Subscribe(OnProjectCollectionChanged, false);
             ProjectOpenedEvent.Subscribe(OnProjectOpened, false);
             ProjectClosedEvent.Subscribe(OnProjectClosed, false);
+
+            RetrieveMaps();
             return base.InitializeAsync();
         }
         #endregion
@@ -565,31 +567,6 @@ namespace Esri.APL.FieldStatsQueryHelper {
     }
 
 
-    [ValueConversion(typeof(double), typeof(string))]
-    public class FieldStatDoubleToStringConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value.GetType() == typeof(double) && Double.IsNaN((double)value))
-                return String.Empty;
-            else return value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            return null;
-        }
-    }
-    [ValueConversion(typeof(int), typeof(string))]
-    public class FieldNullIntToStringConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value.GetType() == typeof(int) && (int)value < 0)
-                return String.Empty;
-            else return value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            return null;
-        }
-    }
-
     [ValueConversion(typeof(List<KeyValuePair<double, int>>), typeof(Visibility))]
     public class ChartVisibilityDataAvailableConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
@@ -604,34 +581,6 @@ namespace Esri.APL.FieldStatsQueryHelper {
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             throw new NotImplementedException();
-        }
-    }
-
-    [ValueConversion(typeof(double), typeof(string))]
-    public class SliderLabelDoubleToStringConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value != null && value.GetType() == typeof(double)) {
-                return Math.Round((double)value, 3);
-            } else return value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            throw new NotImplementedException();
-        }
-    }
-
-    [ValueConversion(typeof(double), typeof(double))]
-    public class SliderValueDoubleToFixedDecimalConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value.GetType() == typeof(double)) {
-                return Math.Round((double)value, 3);
-            } else return value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value.GetType() == typeof(double)) {
-                return Math.Round((double)value, 3);
-            } else return value;
         }
     }
 

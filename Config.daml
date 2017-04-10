@@ -12,7 +12,7 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.-->
-<ArcGIS defaultAssembly="FieldStatsQueryHelper.dll" defaultNamespace="Esri.APL.FieldStatsQueryHelper" xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS%20Pro/bin/ArcGIS.Desktop.Framework.xsd">
+<ArcGIS defaultAssembly="FieldStatsQueryHelper.dll" defaultNamespace="Esri.APL.FieldStatsQueryHelper" xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///E:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
   <AddInInfo id="{d1592631-bd40-4a10-a1a8-670c84f199e8}" version="1.0" desktopVersion="1.4.7198">
     <Name>Field Stats Query Helper</Name>
     <Description>Simple definition query builder using statistics on numeric fields</Description>
