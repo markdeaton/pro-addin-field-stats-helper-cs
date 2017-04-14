@@ -97,11 +97,16 @@ namespace Esri.APL.FieldStatsQueryHelper {
         /// <summary>
         /// Data for the histogram
         /// </summary>
+        /// <remarks>
+        /// Note that calling Notify or SetProperty here seems to cause enough updates that the UI may not update properly.
+        /// Make sure to call NotifyPropertyChanged() everywhere the value of the list changes!
+        /// </remarks>
         public List<ChartHistogramItem> _chartData; // = new ObservableCollection<KeyValuePair<int, double>>();
         public List<ChartHistogramItem> ChartData {
             get { return _chartData; }
             set {
-                SetProperty(ref _chartData, value);
+                //SetProperty(ref _chartData, value);
+                _chartData = value;
             }
         }
 
@@ -197,7 +202,8 @@ namespace Esri.APL.FieldStatsQueryHelper {
                 for (int i = 0; i < histogram.BucketCount; i++) {
                     ChartData.Add(new ChartHistogramItem((int)histogram[i].Count, histogram[i].LowerBound, histogram[i].UpperBound));
                 }
-                
+                NotifyPropertyChanged("ChartData");
+
                 // Get min/max values rounded down/up to 3 decimal places
                 RangeMin = RangeLowerVal = Math.Floor(FieldMin * 1000) / 1000;
                 RangeMax = RangeUpperVal = Math.Ceiling(FieldMax * 1000) / 1000;
@@ -538,7 +544,7 @@ namespace Esri.APL.FieldStatsQueryHelper {
         /// <param name="layer"></param>
         private void UpdateFields(FeatureLayer layer) {
             System.Diagnostics.Debug.WriteLine("UpdateFields");
-            _listOfFields.Clear(); ChartData = null;
+            _listOfFields.Clear(); ChartData = null; NotifyPropertyChanged("ChartData");
             System.Diagnostics.Debug.WriteLine("UpdateFields list cleared");
             if (layer == null) {
                 System.Diagnostics.Debug.WriteLine("No feature layer selected");
@@ -573,10 +579,15 @@ namespace Esri.APL.FieldStatsQueryHelper {
             if (value != null
                 && (value.GetType() == typeof(List<ChartHistogramItem>))
                 && ((List<ChartHistogramItem>)value).Count > 0) {
-                    return Visibility.Visible;
+                System.Diagnostics.Debug.WriteLine("Chart visible");
+                return Visibility.Visible;
+            } else {
+                String msg = "Chart hidden; ";
+                if (value == null) msg += "null";
+                else msg += ((List<ChartHistogramItem>)value).Count + " values";
+                System.Diagnostics.Debug.WriteLine(msg);
+                return Visibility.Collapsed;
             }
-            else return Visibility.Collapsed;
-
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {

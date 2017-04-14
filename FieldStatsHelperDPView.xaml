@@ -1,17 +1,18 @@
 ﻿<UserControl
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
-             xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"
-             xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
-             xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-             xmlns:conv="clr-namespace:Esri.APL.FieldStatsQueryHelper" xmlns:Primitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit" x:Class="Esri.APL.FieldStatsQueryHelper.FieldStatsHelperDPView"
-             mc:Ignorable="d" 
-             d:DataContext="{Binding FieldStatsHelperDPViewModel}"
-             d:DesignHeight="300" d:DesignWidth="300"
-             >
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
+    xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+    xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+    xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    xmlns:Primitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit" 
+    xmlns:conv="clr-namespace:Esri.APL.FieldStatsQueryHelper" 
+    x:Class="Esri.APL.FieldStatsQueryHelper.FieldStatsHelperDPView"
+    mc:Ignorable="d" 
+    d:DataContext="{Binding FieldStatsHelperDPViewModel}"
+    d:DesignHeight="487" d:DesignWidth="300">
     <!--//Copyright 2014 Esri
 
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,9 +27,9 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.-->
     <UserControl.Resources>
-        <conv:ChartVisibilityDataAvailableConverter x:Key="chartVisibilityDataAvailConverter"/>
-        <conv:NullToVisibilityConverter x:Key="nullToVisibilityConverter"/>
         <ResourceDictionary x:Key="MergedDictionaries">
+            <conv:ChartVisibilityDataAvailableConverter x:Key="chartVisibilityDataAvailConverter"/>
+            <conv:NullToVisibilityConverter x:Key="nullToVisibilityConverter"/>
             <ResourceDictionary.MergedDictionaries>
                 <extensions:DesignOnlyResourceDictionary Source="pack://application:,,,/ArcGIS.Desktop.Framework;component\Themes\Default.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -37,8 +38,6 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -92,121 +91,121 @@
                            IsHitTestVisible="False"
                            Text="&lt;Select a Field&gt;"/>
         </Grid>
-        <Grid x:Name="descriptiveStatsGroup" Grid.Row="2"
-              Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <DockPanel Grid.Row="2" x:Name="statsAndQuery" Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
+            <Grid x:Name="descriptiveStatsGroup" DockPanel.Dock="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <!--<Separator Grid.Column="1" Grid.RowSpan="3" Width="2" Height="300" HorizontalAlignment="Right" VerticalAlignment="Stretch" Background="Black" />-->
-            <Border Grid.Row="0" Grid.ColumnSpan="4" Width="Auto" Background="Transparent" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource Esri_Gray130}"/>
-            <Border Grid.Row="5" Grid.ColumnSpan="4" Width="Auto" Background="Transparent" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Esri_Gray130}"/>
-            <Border Grid.Column="1" Grid.RowSpan="3" Background="Transparent" BorderThickness="0,0,1,0" Height="Auto" BorderBrush="{DynamicResource Esri_Gray130}"/>
-            
-            <Label Grid.Row="0" Grid.Column="0" Content="Min:" FontWeight="Bold" Margin="0,0,0,1" VerticalAlignment="Bottom"/>
-            <Label Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMin}">
-                <TextBlock Text="{Binding FieldMin, StringFormat=0.000}"/>
-            </Label> 
-                     
-            <Label Grid.Row="0" Grid.Column="2" Content="Max:" FontWeight="Bold"/>
-            <Label Grid.Row="0" Grid.Column="3" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMax}">
-                <TextBlock Text="{Binding FieldMax, StringFormat=0.000}"/>
-            </Label>
-            <Label Grid.Row="1" Grid.Column="0" Content="Mean:" FontWeight="Bold"/>
-            <Label Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMean}">
-                <TextBlock Text="{Binding FieldMean, StringFormat=0.000}"/>
-            </Label>
-            <Label Grid.Row="1" Grid.Column="2" Content="Median:" FontWeight="Bold"/>
-            <Label Grid.Row="1" Grid.Column="3" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMedian}">
-                <TextBlock Text="{Binding FieldMedian, StringFormat=0.000}"/>
-            </Label>
-            <Label Grid.Row="2" Grid.Column="0" Content="Std Dev:" FontWeight="Bold"/>
-            <Label Grid.Row="2" Grid.Column="1" ToolTip="{Binding FieldStdDev}" HorizontalContentAlignment="Right">
-                <TextBlock Text="{Binding FieldStdDev, StringFormat=0.000}"/>
-            </Label>
-            <Label Grid.Row="2" Grid.Column="2" Content="Nulls Ignored:" FontWeight="Bold"/>
-            <Label Grid.Row="2" Grid.Column="3" Content="{Binding FieldNulls, StringFormat=0;}" HorizontalContentAlignment="Right"/>
-            
-        </Grid>
-        <Grid x:Name="chartAndSliderGroup" Grid.Row="3"
-                    Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <chartingToolkit:Chart
+                <!--<Separator Grid.Column="1" Grid.RowSpan="3" Width="2" Height="300" HorizontalAlignment="Right" VerticalAlignment="Stretch" Background="Black" />-->
+                <Border Grid.Row="0" Grid.ColumnSpan="4" Width="Auto" Background="Transparent" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource Esri_Gray130}"/>
+                <Border Grid.Row="5" Grid.ColumnSpan="4" Width="Auto" Background="Transparent" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Esri_Gray130}"/>
+                <Border Grid.Column="1" Grid.RowSpan="3" Background="Transparent" BorderThickness="0,0,1,0" Height="Auto" BorderBrush="{DynamicResource Esri_Gray130}"/>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Min:" FontWeight="Bold" Margin="0,0,0,1" VerticalAlignment="Bottom"/>
+                <Label Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMin}">
+                    <TextBlock Text="{Binding FieldMin, StringFormat=0.000}"/>
+                </Label>
+
+                <Label Grid.Row="0" Grid.Column="2" Content="Max:" FontWeight="Bold"/>
+                <Label Grid.Row="0" Grid.Column="3" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMax}">
+                    <TextBlock Text="{Binding FieldMax, StringFormat=0.000}"/>
+                </Label>
+                <Label Grid.Row="1" Grid.Column="0" Content="Mean:" FontWeight="Bold"/>
+                <Label Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMean}">
+                    <TextBlock Text="{Binding FieldMean, StringFormat=0.000}"/>
+                </Label>
+                <Label Grid.Row="1" Grid.Column="2" Content="Median:" FontWeight="Bold"/>
+                <Label Grid.Row="1" Grid.Column="3" HorizontalContentAlignment="Right" ToolTip="{Binding FieldMedian}">
+                    <TextBlock Text="{Binding FieldMedian, StringFormat=0.000}"/>
+                </Label>
+                <Label Grid.Row="2" Grid.Column="0" Content="Std Dev:" FontWeight="Bold"/>
+                <Label Grid.Row="2" Grid.Column="1" ToolTip="{Binding FieldStdDev}" HorizontalContentAlignment="Right">
+                    <TextBlock Text="{Binding FieldStdDev, StringFormat=0.000}"/>
+                </Label>
+                <Label Grid.Row="2" Grid.Column="2" Content="Nulls Ignored:" FontWeight="Bold"/>
+                <Label Grid.Row="2" Grid.Column="3" Content="{Binding FieldNulls, StringFormat=0;}" HorizontalContentAlignment="Right"/>
+
+            </Grid>
+            <Grid x:Name="chartAndSliderGroup" DockPanel.Dock="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <chartingToolkit:Chart
                     Grid.Row="0" Grid.ColumnSpan="3"
-                    Margin="2, 0, 2, 0" x:Name="chtHistogram" 
+                    Margin="0, 8, 0, 0"  Padding="0,0,0,0"
+                    x:Name="chtHistogram" 
                     Height="200" Width="275"
                     Title="{Binding ChartTitle}">
-                <chartingToolkit:Chart.BorderThickness>0</chartingToolkit:Chart.BorderThickness>
-                <chartingToolkit:Chart.TitleStyle>
-                    <Style TargetType="{x:Type datavis:Title}">
-                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-                        <Setter Property="TextBlock.LineHeight" Value="20"/>
-                    </Style>
-                </chartingToolkit:Chart.TitleStyle>
+                    <chartingToolkit:Chart.BorderThickness>0</chartingToolkit:Chart.BorderThickness>
+                    <chartingToolkit:Chart.TitleStyle>
+                        <Style TargetType="{x:Type datavis:Title}">
+                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                            <Setter Property="TextBlock.LineHeight" Value="20"/>
+                        </Style>
+                    </chartingToolkit:Chart.TitleStyle>
 
-                <chartingToolkit:Chart.PlotAreaStyle>
-                    <Style TargetType="{x:Type Grid}">
-                        <Setter Property="Background" Value="Gray"/>
-                        <Setter Property="Opacity" Value="0.15"/>
-                    </Style>
-                </chartingToolkit:Chart.PlotAreaStyle>
-                <chartingToolkit:Chart.Axes>
-                    <chartingToolkit:LinearAxis Orientation="X"/>
-                    <chartingToolkit:LinearAxis Orientation="Y" Title="Count"/>
-                </chartingToolkit:Chart.Axes>
+                    <chartingToolkit:Chart.PlotAreaStyle>
+                        <Style TargetType="{x:Type Grid}">
+                            <Setter Property="Background" Value="Gray"/>
+                            <Setter Property="Opacity" Value="0.15"/>
+                        </Style>
+                    </chartingToolkit:Chart.PlotAreaStyle>
+                    <chartingToolkit:Chart.Axes>
+                        <chartingToolkit:LinearAxis Orientation="X"/>
+                        <chartingToolkit:LinearAxis Orientation="Y" Title="Count"/>
+                    </chartingToolkit:Chart.Axes>
 
-                <chartingToolkit:Chart.LegendStyle>
-                    <Style TargetType="{x:Type datavis:Legend}">
-                        <Setter Property="Width" Value="0"/>
-                    </Style>
-                </chartingToolkit:Chart.LegendStyle>
+                    <chartingToolkit:Chart.LegendStyle>
+                        <Style TargetType="{x:Type datavis:Legend}">
+                            <Setter Property="Width" Value="0"/>
+                        </Style>
+                    </chartingToolkit:Chart.LegendStyle>
 
-                <chartingToolkit:ColumnSeries x:Name="columnSeriesHistogram" IndependentValuePath="RangeMax" DependentValuePath="Count" ItemsSource="{Binding ChartData}"
+                    <chartingToolkit:ColumnSeries x:Name="columnSeriesHistogram" IndependentValuePath="RangeMax" DependentValuePath="Count" ItemsSource="{Binding ChartData}"
                                                   Background="Transparent"/>
 
-            </chartingToolkit:Chart>
-            <xceed:RangeSlider Grid.Row="1" Grid.ColumnSpan="3"
+                </chartingToolkit:Chart>
+                <xceed:RangeSlider Grid.Row="1" Grid.ColumnSpan="3"
                                Minimum="{Binding RangeMin, StringFormat=0.000}" 
                                Maximum="{Binding RangeMax, StringFormat=0.000}" 
                                LowerValue="{Binding RangeLowerVal, Mode=TwoWay, StringFormat=0.000}" 
-                               HigherValue="{Binding RangeUpperVal, Mode=TwoWay, StringFormat=0.000}" Margin="52,0,25,0"/>
-            <Label Grid.Row="2" Grid.Column="0" Margin="52,0,0,0">
-                <TextBlock Text="{Binding RangeLowerVal, StringFormat=0.000}"/>
-            </Label>
-            <Label Grid.Row="2" Grid.Column="2" Margin="0,0,25,0">
-                <TextBlock Text="{Binding RangeUpperVal, StringFormat=0.000}" HorizontalAlignment="Right"/>
-            </Label>
-            <Button Grid.Row="3" Grid.Column="0" Content="Clear SQL"
+                               HigherValue="{Binding RangeUpperVal, Mode=TwoWay, StringFormat=0.000}" Margin="52,0,12,0"/>
+                <Label Grid.Row="2" Grid.Column="0" Margin="52,0,0,0">
+                    <TextBlock Text="{Binding RangeLowerVal, StringFormat=0.000}"/>
+                </Label>
+                <Label Grid.Row="2" Grid.Column="2" Margin="0,0,25,0">
+                    <TextBlock Text="{Binding RangeUpperVal, StringFormat=0.000}" HorizontalAlignment="Right"/>
+                </Label>
+                <Button Grid.Row="3" Grid.Column="0" Content="Clear SQL"
                     Style="{DynamicResource Esri_SimpleButton}"
                     Command="{Binding ClearSqlCommand}"/>
-            <Button Grid.Row="3" Grid.Column="2" Content="Apply Query"
+                <Button Grid.Row="3" Grid.Column="2" Content="Apply Query"
                     Style="{DynamicResource Esri_SimpleButton}"
                     Command="{Binding ApplyQueryCommand}"/>
-            <Button Grid.Row="3" Grid.Column="1" Content="Add Clause" 
+                <Button Grid.Row="3" Grid.Column="1" Content="Add Clause" 
                     Style="{DynamicResource Esri_SimpleButton}"
                     Command="{Binding AddSqlClauseCommand}"/>
-        </Grid>
-        <TextBox Grid.Row="4" TextWrapping="Wrap" Text="{Binding SqlWhereClause, Mode=TwoWay}"
-                 Visibility="{Binding ChartData, Converter={StaticResource chartVisibilityDataAvailConverter}}"/>
+            </Grid>
+            <TextBox Height="Auto" TextWrapping="Wrap" Text="{Binding SqlWhereClause, Mode=TwoWay}"/>
+        </DockPanel>
     </Grid>
 </UserControl>
