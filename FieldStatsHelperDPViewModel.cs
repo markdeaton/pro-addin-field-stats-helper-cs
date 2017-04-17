@@ -98,15 +98,16 @@ namespace Esri.APL.FieldStatsQueryHelper {
         /// Data for the histogram
         /// </summary>
         /// <remarks>
-        /// Note that calling Notify or SetProperty here seems to cause enough updates that the UI may not update properly.
-        /// Make sure to call NotifyPropertyChanged() everywhere the value of the list changes!
+        /// Note that multiple fast updates to ChartData and the resulting property update notifications
+        /// seem to cause enough updates that the UI may not update properly.
+        /// Try not to update ChartData in a loop; instead, assign a temp variable to it after the loop.
         /// </remarks>
         public List<ChartHistogramItem> _chartData; // = new ObservableCollection<KeyValuePair<int, double>>();
         public List<ChartHistogramItem> ChartData {
             get { return _chartData; }
             set {
-                //SetProperty(ref _chartData, value);
-                _chartData = value;
+                SetProperty(ref _chartData, value);
+                //_chartData = value;
             }
         }
 
@@ -154,7 +155,6 @@ namespace Esri.APL.FieldStatsQueryHelper {
                 if (_selectedField != null) {
                     UpdateFieldStats();
                 }
-                NotifyPropertyChanged("ChartTitle");
                 System.Diagnostics.Debug.WriteLine("Selected field changed");
             }
         }
@@ -198,11 +198,11 @@ namespace Esri.APL.FieldStatsQueryHelper {
 
                 Histogram histogram = new Histogram(values, 25);
 
-                ChartData = new List<ChartHistogramItem>();
+                List<ChartHistogramItem> newChartData = new List<ChartHistogramItem>();
                 for (int i = 0; i < histogram.BucketCount; i++) {
-                    ChartData.Add(new ChartHistogramItem((int)histogram[i].Count, histogram[i].LowerBound, histogram[i].UpperBound));
+                    newChartData.Add(new ChartHistogramItem((int)histogram[i].Count, histogram[i].LowerBound, histogram[i].UpperBound));
                 }
-                NotifyPropertyChanged("ChartData");
+                ChartData = newChartData;
 
                 // Get min/max values rounded down/up to 3 decimal places
                 RangeMin = RangeLowerVal = Math.Floor(FieldMin * 1000) / 1000;
@@ -544,7 +544,7 @@ namespace Esri.APL.FieldStatsQueryHelper {
         /// <param name="layer"></param>
         private void UpdateFields(FeatureLayer layer) {
             System.Diagnostics.Debug.WriteLine("UpdateFields");
-            _listOfFields.Clear(); ChartData = null; NotifyPropertyChanged("ChartData");
+            _listOfFields.Clear(); ChartData = null;
             System.Diagnostics.Debug.WriteLine("UpdateFields list cleared");
             if (layer == null) {
                 System.Diagnostics.Debug.WriteLine("No feature layer selected");
